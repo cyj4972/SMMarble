@@ -8,7 +8,7 @@
 #ifndef smm_object_h
 #define smm_object_h
 
-//유형별 번호 
+//node type 
 #define SMMNODE_TYPE_LECTURE		0		//강의 
 #define SMMNODE_TYPE_RESTAURANT		1		//식당
 #define SMMNODE_TYPE_LABORATORY		2		//실험실 
@@ -25,17 +25,7 @@ typedef enum smmObjType{
 	smmObjType_grade
 }smmObjType_e;
 
-/* node type :
-    lecture,
-    restaurant,
-    laboratory,
-    home,
-    experiment,
-    foodChance,
-    festival
-*/
-
-
+//성적 
 typedef enum smmObjGrade{
 	smmObjType_AP = 0,
 	smmObjType_A0,
@@ -48,8 +38,6 @@ typedef enum smmObjGrade{
 	smmObjType_CM
 }smmObjGrade_e;
 
-
-
 //object generation
 void smmObj_genObject(char* name, smmObjType_e objType, int credit, int energy, smmObjGrade_e grade);
 
@@ -61,6 +49,5 @@ int smmObj_getNodeEnergy(int node_nr);
 
 //element to string
 char* smmObj_getTypeName(int type);
-
 
 #endif /* smm_object_h */

@@ -12,7 +12,7 @@
 #define MAX_NODETYPE    7
 #define MAX_GRADE       9
 #define MAX_NODE        100
-
+ 
 static char smmNodeName[SMMNODE_TYPE_MAX][MAX_CHARNAME] = {
 	"강의",
 	"식당",
@@ -27,7 +27,6 @@ char *smmObj_getTypeName(int type)
 {
 	return (char*)smmNodeName[type];
 } 
-
 
 //1. 구조체 형식 정의
 typedef struct smmObject{
@@ -62,6 +61,7 @@ void smmObj_genObject(char* name, smmObjType_e objType, int type, int credit, in
 	return ptr;
 }
 
+//member retrieving
 char* smmObj_getNodeName(void* obj)
 {	
 	smmObject_t* ptr = (smmObject_t*)obj;
@@ -85,19 +85,14 @@ int smmObj_getNodeEnergy(int node_nr)
 }
 
 #if 0
-//member retrieving
-
-
-
 //element to string
-char* smmObj_getNodeName(smmNode_e type)
+char* smmObj_getTypeName(smmNode_e type)
 {
-    return smmNodeName[type];
+    return smmNodeName[type];		//이게 smmObj_getTypeName인가? 
 }
 
-char* smmObj_getGradeName(smmGrade_e grade)
+char* smmObj_getGradeName(smmObjGrade_e grade)
 {
     return smmGradeName[grade];
 }
-
 #end if
