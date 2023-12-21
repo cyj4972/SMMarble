@@ -12,28 +12,57 @@
 #define MAX_NODETYPE    7
 #define MAX_GRADE       9
 
+//1. 구조체 형식 정의
+typedef struct smmObject {
+       char name[MAX_CHARNAME];
+       smmObjType_e objType; 
+       int type;
+       int credit;
+       int energy;
+       smmObjGrade_e grade;
+} smmObject_t;
 
+static smmObject_t smm_node[MAX_NODE];
+static int smmObj_noNode = 0;
 
+//3. 관련 함수 변경 
 //object generation
-void smmObj_genNode(void)
-{
+int smmObj_genObject(char* name, smmObjType_e objType, int type, int credit, int energy, smmObjGrade_e grade)
+{    
+    smmObject_t* ptr;
     
+    ptr = (smmObject_t*)malloc(sizeof(smmObject_t));
+    
+    strcpy(ptr->name, name);
+    ptr->objType = objType;
+    ptr->type = type;
+    ptr->credit = credit;
+    ptr->energy = energy;
+    ptr->grade = grade;
+    
+    return ptr;
 }
 
-
-
-//member retrieving
-
-
-
-//element to string
-char* smmObj_getNodeName(smmNode_e type)
+//3. 관련 함수 변경 
+char* smmObj_getNodeName(void* obj)
 {
-    return smmNodeName[type];
+    smmObject_t* ptr = (smmObject_t*)obj;
+    
+    return ptr->name;
 }
 
-char* smmObj_getGradeName(smmGrade_e grade)
+//3. 관련 함수 변경 
+int smmObj_getNodeType(int node_nr)
 {
-    return smmGradeName[grade];
+    return smm_node[node_nr].type;
 }
 
+int smmObj_getNodeCredit(int node_nr)
+{
+    return smm_node[node_nr].credit;
+}
+
+int smmObj_getNodeEnergy(int node_nr)
+{
+    return smm_node[node_nr].energy;
+}

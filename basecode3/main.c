@@ -20,6 +20,7 @@
 static int board_nr;
 static int food_nr;
 static int festival_nr;
+static int player_nr;
 
 typedef struct player{
 	int energy;
@@ -38,7 +39,7 @@ void printGrades(int player); //print grade history of the player
 void goForward(int player, int step); //make player go "step" steps on the board (check if player is graduated)
 void printPlayerStatus(void); //print all player status at the beginning of each turn
 float calcAverageGrade(int player); //calculate average grade of the player
-smmGrade_e takeLecture(int player, char *lectureName); //take the lecture (insert a grade of the player)
+smmObjGrade_e takeLecture(int player, char *lectureName); //take the lecture (insert a grade of the player)
 void* findGrade(int player, char *lectureName); //find the grade from the player's grade history
 void printGrades(int player); //print all the grade history of the player
 
@@ -90,7 +91,7 @@ void printGrades(int player)
 		
 	}
  } 
-#end if
+#endif
 
 //player 정보 출력 
 void printPlayerStatus(void)
@@ -103,7 +104,7 @@ void printPlayerStatus(void)
 		printf("%s : credit %i, energy %i, position %i\n",
 					cur_player[i].name,
 					cur_player[i].accumCredit,
-					cur_player[i].energy.
+					cur_player[i].energy,
 					cur_player[i].position);
 	 } 
  }
@@ -181,7 +182,7 @@ void goForward(int player, int step)
      
     printf("%s go to node %i (name: %s)\n", 
                 cur_player[player].name, cur_player[player].position,
-                smmObj_getNodeName(boardPtr);
+                smmObj_getNodeName(boardPtr));
 }
 
 int main(int argc, const char * argv[]) {
@@ -299,7 +300,7 @@ int main(int argc, const char * argv[]) {
         printPlayerStatus();
         
         //4-2. die rolling (if not in experiment)
-        die result = rolldie(turn);
+        die_result = rolldie(turn);
         
         //4-3. go forward
         goForward(turn, die_result);
