@@ -33,41 +33,52 @@ typedef struct player{
 static player_t *cur_player;
 
 //function prototypes
-int isGraduated(void); //check if any player is graduated
+int isGraduated(turn); //check if any player is graduated
 	//print grade history of the player
 void goForward(int player, int step); //make player go "step" steps on the board (check if player is graduated)
 void printPlayerStatus(void); //print all player status at the beginning of each turn
 float calcAverageGrade(int player); //calculate average grade of the player		//짜야함
-int takeLecture(int player, char *lectureName, int lectureCredit); //take the lecture
+int takeLecture(int player, char *lectureName); //take the lecture
 void* findGrade(int player, char *lectureName); //find the grade from the player's grade history		//짜야함
 void printGrades(int player); //print all the grade history of the player
 
 //졸업 여부 확인 
-int isGraduated(void)
+int isGraduated(player)
 {
-	int i;
-	for (i=0;i<player_nr;i++)
-	{
-		if(cur_player[i].accumCredit >= GRADUATE_CREDIT)
-			cur_player[i].flag_graduate = 1;
-			printf("%s 졸업을 축하합니다!!\n", cur_player[i].name);
-			break;
-	}
-	return cur_player[i].flag_graduate = 1;
-}
+	//플레이어의 학점이 졸업학점 이상, 플레이어가 집에 도착을 모두 만족해야 졸업 
+	if(cur_player[player].accumCredit >= GRADUATE_CREDIT && cur_player[player].position >= SMMNODE_TYPE_HOME) //정확하게 집에 도착하지 못한 경우는 어떻게? 
+	cur_player[player].flag_graduate = 1;
+	printf("%s 졸업을 축하합니다!!\n", cur_player[player].name);
+	printf("---------GAME OVER---------\n");
 
-//강의 수강 
-int takeLecture(int player, char *lectureName, int lectureCredit)
+	return cur_player[player].flag_graduate;
+}
+#if 0
+//강의 수강 여부 확인
+int takeLecture(int player, char *lectureName)
 {
 	char c;
+	smmObjGrade_e lectureGrade;
+	//플레이어가 강의 노드에 위치 
 	if(smmObj_getNodeType(cur_player[player].position) == SMMNODE_TYPE_LECTURE)
-		if(cur_player[player].accumCredit > lectureCredit)
+		//플레이어의 에너지가 충분한지 확인 
+		if(cur_player[player].energy > smmObj_getNodeEnergy(cur_player[player].position))
 			{
+				//수강 여부 확인
 				printf("%s를 수강하시겠습니까?(Y/N)\n", lectureName);
 				c = getchar();
     			fflush(stdin);
+    			
+    			//수강할 경우 
+    			if(c == 'Y')
+    			{	//성적, 수강여부 저장
+    				lectureGrade = rand()%MAX_GRADE;
+    				 = smmObjLecture_register;
+				}
+				else
+				
     		}
-    return c;
+    return lectureGrade, ;
 }
 
 //성적 출력 
@@ -78,14 +89,15 @@ void printGrades(int player)
 	for(i=0;i<smmdb_len(LISTNO_OFFSET_GRADE + player);i++)
 	{
 		gradePtr = smmdb_getData(LISTNO_OFFSET_GRADE + player, i);
-		if(takeLecture(player, smmObj_getNodeName(gradePtr), smmObj_getNodeCredit(gradePtr)) == 'Y')
-			smmObjGrade smmObjGrade_e lectureGrade = rand()%MAX_GRADE;
-			printf("%s(수강) : %s\n", smmObj_getNodeName(gradePtr), lectureGrade);
+		if()
+		{
+			printf("%s(수강) : %s\n", smmObj_getNodeName(gradePtr), );
+		}
 		else
 			printf("%s(미수강)\n", smmObj_getNodeName(gradePtr));
 	}
 } 
-
+#endif
 //player 정보 출력 
 void printPlayerStatus(void)
 {
@@ -93,6 +105,7 @@ void printPlayerStatus(void)
 	//모든 플레이어의 정보가 출력될 때까지 반복 
 	for (i=0;i<player_nr;i++)
 	{
+		//플레이어 정보 
 		printf("%s : credit %i, energy %i, position %i\n",
 					 cur_player[i].name,
 					 cur_player[i].accumCredit,
@@ -146,19 +159,21 @@ void actionNode(int player)
 	int type = smmObj_getNodeType(boardPtr);
 	char *name = smmObj_getNodename(boardPtr);
 	void *gradePtr;
+	int step = rolldie(player);
+	int lectureGrade;
 	
     switch(type)
     {
         //case lecture:
         case SMMNODE_TYPE_LECTURE:
-        	if(takeLecture(player, smmObj_getNodeName(gradePtr), smmObj_getNodeCredit(gradePtr)) == 'Y')
+        	if(takeLecture(player, smmObj_getNodeName(gradePtr)) == 'Y')
         	{
         		cur_player[player].accumCredit += smmObj_getNodeCredit(boardPtr);
         		cur_player[player].energy -= smmObj_getNodeEnergy(boardPtr);
 				cur_player[player].position += step;
 			}
-			
-			gradePtr= smmObj_genObject(name, smmObjType_grade, 0, smmObj_getNodeCredit(boardPtr), 0, //성적 rand%()MAX_GRADE);
+			 
+			gradePtr = smmObj_genObject(name, smmObjType_grade, 0, 0, lectureGrade);
         	smmdb_addTail(LISTNO_OFFSET_GRADE + player, gradePtr);
 			
 			break;
@@ -178,7 +193,7 @@ void goFoward(int player, int step)
 				smmObj_getNodeName(boardPtr));
 }
 
-//게임 실행 과정 
+ 
 int main(int argc, const char * argv[]) {
     
     FILE* fp;
@@ -211,11 +226,11 @@ int main(int argc, const char * argv[]) {
     while (fscanf(fp, "%s %i %i %i", name, &type, &credit, &energy) == 4)
     {
         //store the parameter set
-        void *boardObj = smmObj_genObject(name, smmObjType_board, type, credit, energy, 0);
+        void *boardObj = smmObj_genObject(name, smmObjType_board, credit, energy, 0);
         smmdb_addTail(LISTNO_NODE, boardObj);
         
 		if(type == SMMNODE_TYPE_HOME)
-			initEnergy = energy;
+			energy = initEnergy;
         board_nr++;
     }
     fclose(fp);
@@ -230,10 +245,7 @@ int main(int argc, const char * argv[]) {
 						smmObj_getNodeType(boardObj), smmObj_getTypeName(smmObj_getNodeType(boardObj)),
 						smmObj_getNodeCredit(boardObj), smmObj_getNodeEnergy(boardObj));
 	} 
-	
-    //printf("(%s)", smmObj_getTypeName(SMMNODE_TYPE_LECTURE));
     
-    #if 0
     //2. food card config 
     if ((fp = fopen(FOODFILEPATH,"r")) == NULL)
     {
@@ -246,17 +258,19 @@ int main(int argc, const char * argv[]) {
     while (fscanf(fp, "%s %i", name, &energy) == 2)
     {
         //store the parameter set
-        void *foodObj = smmObj_genObject(name, smmObjType_food, type, 0, energy, 0);
+        void *foodObj = smmObj_genObject(name, smmObjType_card, 0, energy, 0);
         smmdb_addTail(LISTNO_FOODCARD, foodObj);
-        
-        
-
-        //void *foodObj = smm_getData(LISTNO_FOODCARD, i)
     }
     fclose(fp);
     printf("Total number of food cards : %i\n", food_nr);
     
-    
+    for (i=0;i<food_nr;i++)
+    {
+    	void *foodObj = smmdb_getData(LISTNO_FOODCARD, i);
+    	
+    	printf("food %i : %s, energy %i\n",
+						i, smmObj_getNodeName(foodObj), smmObj_getNodeEnergy(foodObj));
+	}
     
     //3. festival card config 
     if ((fp = fopen(FESTFILEPATH,"r")) == NULL)
@@ -266,13 +280,23 @@ int main(int argc, const char * argv[]) {
     }
     
     printf("\n\nReading festival card component......\n");
-    while () //read a festival card string
+    //read a festival card string
+	while (fscanf(fp, "%s", name) == 1)
     {
         //store the parameter set
+        void *festObj = smmObj_genObject(name, smmObjType_card, 0, 0, 0);
+        smmdb_addTail(LISTNO_FESTCARD, festObj);
     }
     fclose(fp);
     printf("Total number of festival cards : %i\n", festival_nr);
-    #end if
+    
+    for (i=0;i<festival_nr;i++)
+    {
+    	void *festObj = smmdb_getData(LISTNO_FESTCARD, i);
+    	
+    	printf("festival %i : %s\n",
+							i, smmObj_getNodeName(festObj));
+	}
     
     
     //2. Player configuration ---------------------------------------------------------------------------------
@@ -284,19 +308,24 @@ int main(int argc, const char * argv[]) {
     	scanf("%d", &player_nr);
     	fflush(stdin);
     }
-    while (player_nr < 0 || player > MAX_PLAYER);
+    while (player_nr < 0 || player_nr > MAX_PLAYER);
     
-    cur_player = (player_t*)malloc(player_nr*sizeof(player-t));
+    cur_player = (player_t*)malloc(player_nr*sizeof(player_t));
     generatePlayers(player_nr, initEnergy);
     
     
     //3. SM Marble game starts ---------------------------------------------------------------------------------
-    while () //is anybody graduated?
+    printf("============\n");
+	printf("SMMarble\n");
+	printf("============\n");
+    
+	//졸업 여부에 따라 반복 
+	while (cur_player[turn].flag_graduate != 1) //is anybody graduated?
     {
         int die_result;
         
         //4-1. initial printing
-        printPlayerStatus();
+		printPlayerStatus();
         
         //4-2. die rolling (if not in experiment)
         die_result = rolldie(turn);
@@ -308,10 +337,13 @@ int main(int argc, const char * argv[]) {
         actionNode(turn);
         
         //4-5. next turn
-        turn = (turn+1)%player_nr; 
+        turn = (turn+1)%player_nr;
+        
+        //4-6. 졸업 여부 확인
+        isGraduated(turn);
         
     }
-    #endif
+    
     free(cur_player);
     
     system("PAUSE");

@@ -8,10 +8,6 @@
 #include "smm_common.h"
 #include "smm_object.h"
 #include <string.h>
-
-#define MAX_NODETYPE    7
-#define MAX_GRADE       9
-#define MAX_NODE        100
  
 static char smmNodeName[SMMNODE_TYPE_MAX][MAX_CHARNAME] = {
 	"강의",
@@ -39,13 +35,13 @@ typedef struct smmObject{
 }smmObject_t;
 
 //2. 구조체 배열 변수 선언 
-// static smmObject_t smm_node[MAX_NODE];
-//static int smmObj_noNode=0;
+static smmObject_t smm_node[MAX_NODE];
+static int smmObj_noNode=0;
 
 
 //3. 기존 함수 수정 및 새로 작성 
 //object generation
-void smmObj_genObject(char* name, smmObjType_e objType, int type, int credit, int energy, smmObjGrade_e grade)
+int smmObj_genObject(char* name, smmObjType_e objType, int type, int credit, int energy, smmObjGrade_e grade)
 { 
 	smmObject_t* ptr;
 	
@@ -83,16 +79,3 @@ int smmObj_getNodeEnergy(int node_nr)
 {
 	return smm_node[node_nr].energy;
 }
-
-#if 0
-//element to string
-char* smmObj_getTypeName(smmNode_e type)
-{
-    return smmNodeName[type];		//이게 smmObj_getTypeName인가? 
-}
-
-char* smmObj_getGradeName(smmObjGrade_e grade)
-{
-    return smmGradeName[grade];
-}
-#end if
