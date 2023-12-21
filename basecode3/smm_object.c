@@ -22,6 +22,12 @@ typedef struct smmObject {
        smmObjGrade_e grade;
 } smmObject_t;
 
+typedef struct smmLecture{
+		
+		smmObjGrade_e grade; 
+		
+};
+
 static smmObject_t smm_node[MAX_NODE];
 static int smmObj_noNode = 0;
 
@@ -52,17 +58,30 @@ char* smmObj_getNodeName(void* obj)
 }
 
 //3. 관련 함수 변경 
-int smmObj_getNodeType(int node_nr)
+int smmObj_getNodeType(void* obj)
 {
-    return smm_node[node_nr].type;
+	smmObject_t* ptr = (smmObject_t*)obj;
+	
+    return ptr->type;
 }
 
-int smmObj_getNodeCredit(int node_nr)
+int smmObj_getNodeCredit(void* obj)
 {
-    return smm_node[node_nr].credit;
+	smmObject_t* ptr = (smmObject_t*)obj;
+	
+    return ptr->credit;
 }
 
-int smmObj_getNodeEnergy(int node_nr)
+int smmObj_getNodeEnergy(void* obj)
 {
-    return smm_node[node_nr].energy;
+	smmObject_t* ptr = (smmObject_t*)obj;
+	
+    return ptr->energy;
+}
+
+int smmObj_getNodeGrade(void* obj)
+{
+	smmObject_t* ptr = (smmObject_t*)obj;
+	
+    return ptr->grade;
 }
